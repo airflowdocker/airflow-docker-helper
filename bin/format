@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+isort -rc src/airflow_docker_helper
+black src/airflow_docker_helper

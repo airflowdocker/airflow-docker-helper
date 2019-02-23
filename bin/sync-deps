@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export SLUGIFY_USES_TEXT_UNIDECODE=${SLUGIFY_USES_TEXT_UNIDECODE:-yes}
+pip-compile -o deps/testing-requirements.txt deps/testing-requirements.in
+python2 -m piptools compile -o deps/testing-requirements.txt deps/testing-requirements.in
+python2 -m piptools compile -o deps/docs-requirements.txt deps/docs-requirements.in
+python2 -m piptools compile -o deps/linting-requirements.txt deps/linting-requirements.in
