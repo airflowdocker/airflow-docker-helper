@@ -24,6 +24,7 @@ setup(
     version='0.1.2',
     description='A light sdk to be used by the operators in airflow-docker and in task code to participate in host/container communication.',
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     author='Hunter Senft-Grupp',
     author_email='huntcsg@gmail.com',
     url='https://github.com/huntcsg/airflow-docker-helper',
