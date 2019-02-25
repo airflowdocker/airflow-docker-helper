@@ -21,7 +21,7 @@ with open('README.md', 'rb') as f:
 
 setup(
     name='airflow-docker-helper',
-    version='0.1.1',
+    version='0.1.2',
     description='A light sdk to be used by the operators in airflow-docker and in task code to participate in host/container communication.',
     long_description=LONG_DESCRIPTION,
     author='Hunter Senft-Grupp',
