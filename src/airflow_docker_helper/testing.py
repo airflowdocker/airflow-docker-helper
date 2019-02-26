@@ -65,6 +65,63 @@ def test_client(mock_context=None):
             ):
                 return client.context(*args, **kwargs)
 
+        @classmethod
+        def assert_sensor_called_with(cls, value):
+            assert (
+                len(cls._mock_sensor_file().write.mock_calls) >= 1
+            ), "Sensor never called"
+            assert (
+                json.loads(
+                    cls._mock_sensor_file().write.mock_calls[0][1][0].decode("utf-8")
+                )
+                == value
+            ), "Sensor not called with expected value"
+
+        @classmethod
+        def assert_short_circuited(cls):
+            assert (
+                len(cls._mock_short_circuit_file().write.mock_calls) >= 1
+            ), "Never short circuited"
+            assert (
+                json.loads(
+                    cls._mock_short_circuit_file()
+                    .write.mock_calls[0][1][0]
+                    .decode("utf-8")
+                )
+                is False
+            ), "Did not short circuit as expected"
+
+        @classmethod
+        def assert_not_short_circuited(cls):
+            assert (
+                len(cls._mock_short_circuit_file().write.mock_calls) == 0
+            ), "Short circuited"
+
+        @classmethod
+        def assert_branched_to_tasks(cls, tasks, written=True):
+            if not written:
+                assert (
+                    len(cls._mock_branch_to_tasks_file().write.mock_calls) == 0
+                ), "Tasks to branch to were written"
+                assert not tasks, "Unexpected tasks to branch to when not written"
+            else:
+                assert (
+                    len(cls._mock_branch_to_tasks_file().write.mock_calls) >= 1
+                ), "Never branched to tasks"
+                assert set(
+                    json.loads(
+                        cls._mock_branch_to_tasks_file()
+                        .write.mock_calls[0][1][0]
+                        .decode("utf-8")
+                    )
+                ) == set(tasks), "A different set of tasks were branched to"
+
+        @classmethod
+        def assert_context_accessed(cls):
+            assert (
+                len(cls._mock_context_file().read.mock_calls) > 0
+            ), "Context never accessed"
+
     return _client
 
 
