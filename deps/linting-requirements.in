@@ -1,3 +1,4 @@
 isort
 black
+bumpversion
 flake8
