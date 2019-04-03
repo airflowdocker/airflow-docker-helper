@@ -25,6 +25,7 @@ BRANCH_OPERATOR_FILENAME = "branch_operator.txt"
 SHORT_CIRCUIT_OPERATOR_FILENAME = "short_circuit.txt"
 SENSOR_OPERATOR_FILENAME = "sensor.txt"
 CONTEXT_FILENAME = "context.json"
+XCOM_PUSH_FILENAME = "xcom_push.json"
 
 
 logger = logging.getLogger("airflow_docker_helper")
@@ -44,6 +45,10 @@ def _get_sensor_file_path(directory):
 
 def _get_context_file_path(directory):
     return os.path.join(directory, CONTEXT_FILENAME)
+
+
+def _get_xcom_push_file_path(directory):
+    return os.path.join(directory, XCOM_PUSH_FILENAME)
 
 
 def _get_container_meta_path():
@@ -100,6 +105,17 @@ class client:
             logger.debug("Loading context")
             return json.loads(f.read().decode("utf-8"))
 
+    @classmethod
+    def xcom_push(cls, key, value):
+        meta_path = _get_container_meta_path()
+        file_path = _get_xcom_push_file_path(meta_path)
+
+        data = json.dumps({"key": key, "value": value}) + "\n"
+        with open(file_path, "ab") as f:
+            f.write(data.encode("utf-8"))
+
+        logger.debug("xcom_push data: {}".format(data))
+
 
 class host:
     @staticmethod
@@ -152,6 +168,20 @@ class host:
         with open(context_file_path, "wb") as f:
             logger.info("Writing context to: {}".format(context_file_path))
             f.write(json.dumps(serialize_context(context)).encode("utf-8"))
+
+    @staticmethod
+    def get_xcom_push_data(host_tmp_dir):
+        meta_path = get_host_meta_path(host_tmp_dir)
+        file_path = _get_xcom_push_file_path(meta_path)
+
+        if not os.path.exists(file_path):
+            return []
+
+        with open(file_path, "rb") as f:
+            data = f.read().decode("utf-8")
+
+        logger.info("Getting xcom_push data: {}".format(data))
+        return [json.loads(row) for row in data.strip().split("\n")]
 
     @staticmethod
     def make_meta_dir(host_tmp_dir):

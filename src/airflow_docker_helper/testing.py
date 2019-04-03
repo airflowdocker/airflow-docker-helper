@@ -30,6 +30,7 @@ def test_client(mock_context=None):
         _mock_short_circuit_file = mock.Mock()
         _mock_branch_to_tasks_file = mock.Mock()
         _mock_sensor_file = mock.Mock()
+        _mock_xcom_push_file = mock.Mock()
 
         @classmethod
         def short_circuit(cls, *args, **kwargs):
@@ -64,6 +65,13 @@ def test_client(mock_context=None):
                 ),
             ):
                 return client.context(*args, **kwargs)
+
+        @classmethod
+        def xcom_push(cls, *args, **kwargs):
+            with mock.patch(
+                "{}.open".format(BUILTIN_NAME), mock.mock_open(cls._mock_xcom_push_file)
+            ):
+                return client.xcom_push(*args, **kwargs)
 
         @classmethod
         def assert_sensor_called_with(cls, value):
@@ -125,16 +133,18 @@ def test_client(mock_context=None):
     return _client
 
 
-def test_host(task_ids=None, sensor=None, short_circuit=None):
+def test_host(task_ids=None, sensor=None, short_circuit=None, xcom_push=None):
     class _host:
         _task_ids = task_ids
         _sensor = sensor
         _short_circuit = short_circuit
+        _xcom_push = xcom_push
 
         _mock_context_file = mock.Mock()
         _mock_sensor_file = mock.Mock()
         _mock_short_circuit_file = mock.Mock()
         _mock_branch_file = mock.Mock()
+        _mock_xcom_push = mock.Mock()
 
         @classmethod
         def branch_task_ids(cls, *args, **kwargs):
@@ -196,6 +206,21 @@ def test_host(task_ids=None, sensor=None, short_circuit=None):
                 "{}.open".format(BUILTIN_NAME), mock.mock_open(cls._mock_context_file)
             ):
                 return host.write_context(*args, **kwargs)
+
+        @classmethod
+        def get_xcom_push_data(cls, *args, **kwargs):
+            if cls._xcom_push is None:
+                with mock.patch("os.path.exists") as exists:
+                    exists.return_value = False
+                    return host.get_xcom_push_data(*args, **kwargs)
+            else:
+                with mock.patch(
+                    "{}.open".format(BUILTIN_NAME),
+                    mock.mock_open(cls._mock_sensor_file, read_data=cls._xcom_push),
+                ):
+                    with mock.patch("os.path.exists") as exists:
+                        exists.return_value = True
+                        return host.get_xcom_push_data(*args, **kwargs)
 
         @staticmethod
         def make_meta_dir(*args, **kwargs):
