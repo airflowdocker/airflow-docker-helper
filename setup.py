@@ -56,6 +56,7 @@ setup(
     entry_points={
         'console_scripts': [
             'airflow-docker-helper=airflow_docker_helper.__main__:main',
+            'airflow-docker-call=airflow_docker_helper.call:call',
         ]
     }
 )
