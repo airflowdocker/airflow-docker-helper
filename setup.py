@@ -49,6 +49,7 @@ setup(
     zip_safe=False,
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     extras_require={
+        'dev': parse_requirements('deps/dev-requirements.in'),
         'testing': parse_requirements('deps/testing-requirements.in'),
         'docs': parse_requirements('deps/docs-requirements.in'),
         'linting': parse_requirements('deps/linting-requirements.in'),
@@ -56,6 +57,7 @@ setup(
     entry_points={
         'console_scripts': [
             'airflow-docker-helper=airflow_docker_helper.__main__:main',
+            'airflow-docker-call=airflow_docker_helper.call:call',
         ]
     }
 )

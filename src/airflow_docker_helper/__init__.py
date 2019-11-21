@@ -15,10 +15,12 @@
 # limitations under the License.
 __version__ = "0.2.0"
 
+import base64
 import json
 import logging
 import os
 
+from . import codec
 
 META_PATH_DIR = "__AIRFLOW_META__"
 BRANCH_OPERATOR_FILENAME = "branch_operator.txt"
@@ -61,6 +63,8 @@ def get_host_meta_path(host_dir):
 
 
 class client:
+    codec = codec
+
     @staticmethod
     def branch_to_tasks(task_ids):
         if not isinstance(task_ids, (list, tuple)):
@@ -118,6 +122,8 @@ class client:
 
 
 class host:
+    codec = codec
+
     @staticmethod
     def branch_task_ids(tmp_dir):
         meta_path = get_host_meta_path(tmp_dir)
